@@ -1,6 +1,7 @@
 const Router  = require('koa-router')
 const router = new Router({ prefix:"/users" })
 const connect = require('../db/index')
+const { parsePostData } = require('../utils/index')
 
 router.get("/", async (ctx) => {
     console.log('ctx.request.query',ctx.request.query)
@@ -11,7 +12,13 @@ router.get("/", async (ctx) => {
 });
 
 router.post('/offer',async (ctx) =>{
-    ctx.body = ctx
+    const data = await parsePostData(ctx)
+    ctx.body =  {
+        code: 0,
+        message: 'success',
+        data
+    }
 })
+
 
 module.exports = router;

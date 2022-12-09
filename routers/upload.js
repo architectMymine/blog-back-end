@@ -4,7 +4,6 @@ const path = require("path")
 
 router.post("/",(ctx) => {
     const files = ctx.request.files.files
-    console.log('files',files)
     const urlList = files.map(item=>{
         return {
             fileName: item.originalFilename,

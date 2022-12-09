@@ -14,6 +14,7 @@ app.use(KoaStatic(path.join(__dirname, 'public')))
 app.use(KoaCors())
 app.use(KoaBody({
     multipart: true,
+    encoding:'gzip',
     formidable: {
         maxFileSize: 5 * 1024 * 1024, // 设置上传文件大小最大限制，默认5M
         uploadDir: path.join(__dirname, "public/upload"), //设置文件上传的目录
