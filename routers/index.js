@@ -1,5 +1,4 @@
 const fs = require('fs')
-
 const useRoutes = (app) => {
     fs.readdirSync(__dirname).forEach(file => {
         if (file === 'index.js') return // index.js文件不需要

@@ -1,6 +1,5 @@
 const Router  = require('koa-router')
 const router = new Router({ prefix:"/uploads" })
-const path = require("path")
 
 router.post("/",(ctx) => {
     const files = ctx.request.files.files

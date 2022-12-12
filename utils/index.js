@@ -1,6 +1,4 @@
-module.exports  =  {
-    parsePostData
-}
+
 
 function parsePostData(ctx){
     return new Promise((resolve,reject)=>{
@@ -16,4 +14,9 @@ function parsePostData(ctx){
             reject(error)
         }
     })
+}
+
+
+module.exports  =  {
+    parsePostData
 }
