@@ -8,7 +8,7 @@ class Result {
     constructor(data, msg) {
         this.data = null
         if(arguments.length === 0) {
-            this.msg = data
+            this.msg = '操作成功'
         }else {
             this.data = data
             this.msg = msg
@@ -16,15 +16,15 @@ class Result {
     }
     success() {
         this.code = CODE_SUCCESS
-        this.result()
+        return this.result()
     }
     error() {
         this.code = CODE_ERROR
-        this.result()
+        return this.result()
     }
     jwtError() {
         this.code = CODE_TOKEN_EXPIRED
-        this.result()
+        return this.result()
     }
     result() {
         const base = {
@@ -32,7 +32,7 @@ class Result {
             msg: this.msg
         }
         this.data && (base.data = this.data)
-        return JSON.parse(base)
+        return base
     }
 }
 
