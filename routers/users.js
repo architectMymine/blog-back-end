@@ -45,13 +45,16 @@ router.post('/login', async (ctx) => {
     ctx.body = result
 })
 
-router.post('/offer', async (ctx) => {
-    const data = await parsePostData(ctx)
-    ctx.verifyParams({
-        age: { type: 'number', require: true },
-        name: { type: 'number', require: true }
-    }, { ...data })
-    ctx.body = new Result(data, '访问成功').success()
+router.get('/info', async (ctx) => {
+    let token = ctx.header.authorization
+    if(token.includes('Bearer ')) {
+        token = token.replace('Bearer ','')
+    }
+    // 解析token
+    const decode = jwt.verify(token,TOKEN_SECRET)
+    if(decode && decode.username) {
+
+    }
 })
 
 

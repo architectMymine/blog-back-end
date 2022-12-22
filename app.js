@@ -24,14 +24,14 @@ app.use(KoaCors())
 app.use(koaParameter(app))
 
 // token失效401处理
-app.use(function(ctx, next){
+app.use(function (ctx, next) {
     return next().catch((err) => {
         if (401 == err.status) {
             ctx.status = 401;
-            if(!ctx.header.authorization  || ctx.header.authorization.indexOf('Bearer ') == -1){
-                ctx.body = new Result(null,'未携带token').jwtError();
-            }else {
-                ctx.body = new Result(null,'token过期').jwtError();
+            if (!ctx.header.authorization || ctx.header.authorization.indexOf('Bearer ') == -1) {
+                ctx.body = new Result(null, '未携带token').jwtError();
+            } else {
+                ctx.body = new Result(null, 'token过期').jwtError();
             }
         } else {
             throw err;
@@ -59,7 +59,6 @@ app.use(KoaBody({
 
 // 批量路由注册
 useRoutes(app)
-
 
 
 app.listen(3000, () => {
