@@ -60,7 +60,6 @@ app.use(KoaBody({
 // 批量路由注册
 useRoutes(app)
 
-
 app.listen(3000, () => {
     console.log('服务启动了')
 })
