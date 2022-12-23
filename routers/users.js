@@ -31,18 +31,17 @@ router.post('/login', async (ctx) => {
         password: { type: 'string', require: true },
     }, { ...data })
     let result = {}
-    await findUser(data.username, data.password).then(user => {
-        if(!user && user.length === 0) {
-            result =  new Result(null,'账号或密码错误').error()
-        }else {
-            const token = jwt.sign(
-                { username: data.username },
-                TOKEN_SECRET,
-                { expiresIn: JWT_EXPIRED }
-            )
-            result = new Result({ token },'登录成功').success()
-        }
-    })
+    const user = await findUser(data.username, data.password)
+    if(!user && user.length === 0) {
+        result =  new Result(null,'账号或密码错误').error()
+    }else {
+        const token = jwt.sign(
+            { username: data.username },
+            TOKEN_SECRET,
+            { expiresIn: JWT_EXPIRED }
+        )
+        result = new Result({ token },'登录成功').success()
+    }
     ctx.body = result
 })
 
