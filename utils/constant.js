@@ -3,5 +3,6 @@ module.exports = {
     CODE_ERROR: -1,
     CODE_TOKEN_EXPIRED: -2,
     TOKEN_SECRET: 'baxuetuan.yangkang',
-    JWT_EXPIRED: 60 * 60 * 2
+    JWT_EXPIRED: 60 * 60 * 2,
+    SERVER_PORT: 3000
 }

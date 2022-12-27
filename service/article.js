@@ -6,8 +6,8 @@ function addArticle(data) {
 }
 
 // 获取文章列表
-function getArticleList({pageNum,pageSize}) {
-    return connection.query(`select name as article_name, label, cover, summary, content from article LIMIT ${pageNum},${pageSize}`)
+function getArticleList(pageNum,pageSize) {
+    return connection.query(`select name as article_name, label, cover, summary, content from article order by articleId LIMIT ${pageNum},${pageSize}`)
 }
 
 // 获取文章总数

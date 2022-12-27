@@ -32,15 +32,15 @@ router.post('/login', async (ctx) => {
     }, { ...data })
     let result = {}
     const user = await findUser(data.username, data.password)
-    if(!user && user.length === 0) {
-        result =  new Result(null,'账号或密码错误').error()
-    }else {
+    if (!user && user.length === 0) {
+        result = new Result(null, '账号或密码错误').error()
+    } else {
         const token = jwt.sign(
             { username: data.username },
             TOKEN_SECRET,
             { expiresIn: JWT_EXPIRED }
         )
-        result = new Result({ token },'登录成功').success()
+        result = new Result({ token }, '登录成功').success()
     }
     ctx.body = result
 })
@@ -48,21 +48,21 @@ router.post('/login', async (ctx) => {
 // 获取用户信息
 router.get('/info', async (ctx) => {
     let token = ctx.header.authorization
-    if(token.includes('Bearer ')) {
-        token = token.replace('Bearer ','')
+    if (token.includes('Bearer ')) {
+        token = token.replace('Bearer ', '')
     }
     // 解析token
-    const decode = jwt.verify(token,TOKEN_SECRET)
+    const decode = jwt.verify(token, TOKEN_SECRET)
     let result = {}
-    if(decode && decode.username) {
-       const userInfo =  await  getUserInfo(decode.username)
-        if(!userInfo && userInfo.length === 0) {
-            result = new Result(null,'获取用户信息失败').error()
-        }else {
-            result = new Result(userInfo[0][0],'获取用户信息成功').success()
+    if (decode && decode.username) {
+        const userInfo = await getUserInfo(decode.username)
+        if (!userInfo) {
+            result = new Result(null, '获取用户信息失败').error()
+        } else {
+            result = new Result(userInfo, '获取用户信息成功').success()
         }
-    }else {
-        result = new Result(null,'解析用户信息失败').error()
+    } else {
+        result = new Result(null, '解析用户信息失败').error()
     }
     ctx.body = result
 })

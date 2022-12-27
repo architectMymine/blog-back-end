@@ -5,7 +5,17 @@ function findUser(username, password) {
 }
 
 function getUserInfo(username) {
-    return connection.query(`select userId as user_id,name ,avatar from users where name = '${username}'`)
+    return new Promise((resolve, reject) => {
+        connection.query(`select userId as user_id,name ,avatar from users where name = '${username}'`).then(userInfo => {
+            if (!userInfo && userInfo.length === 0) {
+                resolve(null)
+            } else {
+                resolve(userInfo[0][0])
+            }
+        }).catch(e => {
+            reject(e)
+        })
+    })
 }
 
 

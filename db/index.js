@@ -1,12 +1,18 @@
-const config  = require('./config')
+const {
+    host,
+    port,
+    database,
+    user,
+    password
+} = require('./config')
 const mysql = require('mysql2')
 
 const connections = mysql.createPool({ // 创建连接池
-    host: config.host, // 主机地址
-    port: config.port, // 数据库端口号
-    database: config.database, // 数据库名
-    user: config.user, // mysql数据库等登录名
-    password: config.password //密码
+    host,      // 主机地址
+    port,     // 数据库端口号
+    database, // 数据库名
+    user,     // mysql数据库等登录名
+    password  //密码
 })
 
 connections.getConnection((err, conn) => {

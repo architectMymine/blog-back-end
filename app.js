@@ -8,7 +8,8 @@ const app = new Koa()
 const useRoutes = require('./routers/index')
 const path = require("path")
 const {
-    TOKEN_SECRET
+    TOKEN_SECRET,
+    SERVER_PORT
 } = require('./utils/constant')
 
 const Result = require('./model/Result')
@@ -60,6 +61,6 @@ app.use(KoaBody({
 // 批量路由注册
 useRoutes(app)
 
-app.listen(3000, () => {
+app.listen(SERVER_PORT, () => {
     console.log('服务启动了')
 })
