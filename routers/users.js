@@ -9,7 +9,6 @@ const {
     findUser,
     getUserInfo
 } = require('../service/user')
-
 const jwt = require('jsonwebtoken')
 const {
     TOKEN_SECRET,

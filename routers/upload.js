@@ -4,13 +4,21 @@ const Result = require('../model/Result')
 
 router.post("/",(ctx) => {
     const files = ctx.request.files.files
-    const urlList = files.map(item=>{
-        return {
-            fileName: item.originalFilename,
-            url: `${ctx.origin}/upload/${item.newFilename}`
+    let result = ''
+    if(Array.isArray(files)) {
+        result = files.map(item=>{
+            return {
+                fileName: item.originalFilename,
+                url: `${ctx.origin}/upload/${item.newFilename}`
+            }
+        })
+    }else {
+        result =  {
+            fileName: files.originalFilename,
+            url: `${ctx.origin}/upload/${files.newFilename}`
         }
-    })
-    ctx.body = new Result(urlList,'上传成功').success()
+    }
+    ctx.body = new Result(result,'上传成功').success()
 });
 
 

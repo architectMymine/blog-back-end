@@ -44,7 +44,7 @@ app.use(function (ctx, next) {
 app.use(koaJwt({
     secret: TOKEN_SECRET,
 }).unless({
-    path: ['/', '/users/login']
+    path: ['/', '/users/login', '/uploads']
 }))
 
 // 上传中间件
