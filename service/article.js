@@ -2,12 +2,23 @@ const connection = require('../db')
 
 // 新增文章
 function addArticle(data) {
-    return connection.execute('INSERT INTO article (name, label, cover, summary, content) VALUES (?,?,?,?,?)',data)
+    return new Promise((resolve, reject) => {
+        connection.execute('INSERT INTO article (name, label, cover, summary, content) VALUES (?,?,?,?,?)', data).then(res => {
+            if (!res && res.length === 0) {
+                resolve(false)
+            } else {
+                resolve(true)
+            }
+        }).catch(e => {
+            reject(e)
+        })
+    })
+
 }
 
 // 获取文章列表
-function getArticleList(pageNum,pageSize) {
-    return connection.query(`select name as article_name, label, cover, summary, content from article order by articleId LIMIT ${pageNum},${pageSize}`)
+function getArticleList(pageNum, pageSize) {
+    return connection.query(`select name, label, cover, summary, content from article order by articleId LIMIT ${pageNum},${pageSize}`)
 }
 
 // 获取文章总数

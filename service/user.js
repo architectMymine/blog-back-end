@@ -1,7 +1,18 @@
 const connection = require('../db')
 
 function findUser(username, password) {
-    return connection.query(`select userId as id, name, password from users where name= '${username}' and password = '${password}'`)
+    return new Promise((resolve, reject) => {
+        connection.query(`select userId as id, name, password from users where name= '${username}' and password = '${password}'`).then(res => {
+            if (!res && res.length === 0) {
+                resolve(false)
+            } else {
+                resolve(true)
+            }
+        }).catch(e => {
+            reject(e)
+        })
+    })
+
 }
 
 function getUserInfo(username) {
