@@ -72,8 +72,16 @@ router.post('/update', async (ctx) => {
         summary: { type: 'string', require: true },
         content: { type: 'string', require: true },
     }, { ...data })
-    updateArticle(data)
-    ctx.body = new Result().success()
+    const sqlResult = updateArticle(data)
+    // console.log('sqlResult',sqlResult.sql)
+    let result = {}
+    if (!sqlResult === false) {
+        result = new Result(null, '更新文章成功').success()
+    } else {
+        result = new Result(null, '更新文章失败').error()
+    }
+    ctx.body = result
+
 })
 
 

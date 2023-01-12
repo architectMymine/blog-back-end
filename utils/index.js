@@ -53,11 +53,11 @@ function recombineUpdate(data) {
     let sql = 'set'
     Object.keys(data).forEach(item => {
         if (item !== 'articleId') {
-            sql += ` ${item} = ${data[item]},`
+            sql += ` ${item} = "${data[item]}",`
         }
     })
-    sql.replace(/,$/, '')
-    return sql
+    return sql.replace(/,$/,'')
+     sql
 }
 
 /**

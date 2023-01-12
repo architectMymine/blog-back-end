@@ -22,12 +22,16 @@ function addArticle(data) {
 // 更新文章内容
 function updateArticle(data) {
     return new Promise((resolve, reject) => {
-        const sql = `update article
-                     ${recombineUpdate(data)}
-                     where articleId = ${data.articleId}
-                    `
-        console.log('sql', sql)
-        connection.execute()
+        const sql = `update article ${recombineUpdate(data)} where articleId = ${data.articleId}`
+        connection.execute(sql).then(res => {
+            if (!res && res.length === 0) {
+                resolve(false)
+            } else {
+                resolve(res[0][0])
+            }
+        }).catch(e => {
+            reject(e)
+        })
     })
 }
 
