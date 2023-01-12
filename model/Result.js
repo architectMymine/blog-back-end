@@ -5,13 +5,13 @@ const {
 }  = require('../utils/constant')
 
 class Result {
-    constructor(data, msg) {
+    constructor(data, message) {
         this.data = null
         if(arguments.length === 0) {
-            this.msg = '操作成功'
+            this.message = '操作成功'
         }else {
             this.data = data
-            this.msg = msg
+            this.message = message
         }
     }
     success() {
@@ -29,7 +29,7 @@ class Result {
     result() {
         const base = {
             code: this.code,
-            msg: this.msg
+            message: this.message
         }
         this.data && (base.data = this.data)
         return base

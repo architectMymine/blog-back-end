@@ -11,7 +11,11 @@ function parsePostData(ctx) {
                 postdata += data
             })
             ctx.req.addListener("end", function () {
-                resolve(JSON.parse(postdata))
+                if (postdata.length > 0) {
+                    resolve(JSON.parse(postdata))
+                } else {
+                    resolve({})
+                }
             })
         } catch (error) {
             reject(error)
@@ -26,11 +30,7 @@ function parsePostData(ctx) {
  * @returns {string} where条件语句
  */
 function recombineSearch(data, target) {
-    let keys = []
-    // 剔除空值、null、undefined
-    target.map(key => {
-        if (data[key] != null && data[key] != '') keys.push(key)
-    })
+    let keys = filterUnlessValue(data, target)
     // 组合where条件
     let sql = `where`
     if (keys.length > 0) {
@@ -44,7 +44,38 @@ function recombineSearch(data, target) {
     return sql
 }
 
+/**
+ * 组合更新语句
+ * @param {Object} data  数据源
+ * @returns {string} set语句
+ */
+function recombineUpdate(data) {
+    let sql = 'set'
+    Object.keys(data).forEach(item => {
+        if (item !== 'articleId') {
+            sql += ` ${item} = ${data[item]},`
+        }
+    })
+    sql.replace(/,$/, '')
+    return sql
+}
+
+/**
+ * 过滤空值属性
+ * @param {Object} data  数据源
+ * @param {Array<string>} target 目标数组
+ * @returns {Array} 键数组
+ */
+function filterUnlessValue(data, target) {
+    let keys = []
+    target.map(key => {
+        if (data[key] != null && data[key] != '') keys.push(key)
+    })
+    return keys
+}
+
 module.exports = {
     parsePostData,
-    recombineSearch
+    recombineSearch,
+    recombineUpdate
 }

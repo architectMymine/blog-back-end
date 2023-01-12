@@ -1,4 +1,7 @@
 const connection = require('../db')
+const {
+    recombineUpdate
+} = require('../utils/index')
 
 // 新增文章
 function addArticle(data) {
@@ -14,6 +17,33 @@ function addArticle(data) {
         })
     })
 
+}
+
+// 更新文章内容
+function updateArticle(data) {
+    return new Promise((resolve, reject) => {
+        const sql = `update article
+                     ${recombineUpdate(data)}
+                     where articleId = ${data.articleId}
+                    `
+        console.log('sql', sql)
+        connection.execute()
+    })
+}
+
+// 查询文章
+function getArticleDetail(id) {
+    return new Promise((resolve, reject) => {
+        connection.query(`select * from article where articleId = ${id}`).then(res => {
+            if (!res && res.length === 0) {
+                resolve(false)
+            } else {
+                resolve(res[0][0])
+            }
+        }).catch(e => {
+            reject(e)
+        })
+    })
 }
 
 // 获取文章列表
@@ -72,6 +102,8 @@ function getArticlePageTotal(pageSize, condition) {
 
 module.exports = {
     addArticle,
+    updateArticle,
+    getArticleDetail,
     getArticleList,
     getArticleTotal,
     getArticlePageTotal
