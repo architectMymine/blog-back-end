@@ -1,5 +1,5 @@
 const Router = require('koa-router')
-const router = new Router({ prefix: "/main" })
+const router = new Router({ prefix: "/common" })
 const dayjs = require('dayjs')
 const {
     getDailySentence

@@ -3,20 +3,25 @@ const {
     recombineUpdate
 } = require('../utils/index')
 
+const baseSql = `  
+               select a.articleId,a.name,group_concat(l.name) as label,a.cover,a.summary,a.content
+               from article a,article_label al, label l
+               where a.articleId = al.article_id and al.label_id = l.label_id
+                `
+
 // 新增文章
 function addArticle(data) {
     return new Promise((resolve, reject) => {
-        connection.execute('INSERT INTO article (name, label, cover, summary, content) VALUES (?,?,?,?,?)', data).then(res => {
+        connection.execute('INSERT INTO article (name, cover, summary, content) VALUES (?,?,?,?)', data).then(res => {
             if (!res && res.length === 0) {
                 resolve(false)
             } else {
-                resolve(true)
+                resolve(res[0])
             }
         }).catch(e => {
             reject(e)
         })
     })
-
 }
 
 // 更新文章内容
@@ -38,7 +43,8 @@ function updateArticle(data) {
 // 查询文章
 function getArticleDetail(id) {
     return new Promise((resolve, reject) => {
-        connection.query(`select * from article where articleId = ${id}`).then(res => {
+        const sql = `${baseSql} and articleId = ${id}`
+        connection.query(sql).then(res => {
             if (!res && res.length === 0) {
                 resolve(false)
             } else {
@@ -56,9 +62,10 @@ function getArticleList(pageNum, pageSize, condition) {
         condition = condition.replace(/^where\s+/, ` and `)
     }
     return new Promise((resolve, reject) => {
-        const sql = `select articleId, name, label, cover, summary from article where articleId >=
-                     (select articleId from article order by articleId limit ${pageNum},1) ${condition}
-                     limit ${pageSize}
+        const sql = `
+                    ${baseSql} and articleId >=
+                    (select a.articleId from article a,article_label al  where a.articleId = al.article_id group by articleId limit ${pageNum},1)
+                    ${condition} group by articleId limit ${pageSize}
                     `
         connection.query(sql).then(res => {
             if (!res && res.length === 0) {
@@ -89,18 +96,18 @@ function getArticleTotal(condition) {
 
 }
 
-// 获取文章的总页数
-function getArticlePageTotal(pageSize, condition) {
+// 获取文章标签
+function getArticleLabel() {
     return new Promise((resolve, reject) => {
-        connection.query(`select ceil(count(name) / ${pageSize}) as pageTotal from article ${condition}`).then(res => {
-            if (!res && res.length === 0) {
-                resolve(false)
-            } else {
-                resolve(res[0][0]['pageTotal'])
-            }
-        }).catch(e => {
-            reject(e)
-        })
+      connection.query('select name as label,label_id as value from label order by label_id').then(res=>{
+          if (!res && res.length === 0) {
+              resolve(false)
+          } else {
+              resolve(res[0])
+          }
+      }).catch(e => {
+          reject(e)
+      })
     })
 }
 
@@ -110,5 +117,5 @@ module.exports = {
     getArticleDetail,
     getArticleList,
     getArticleTotal,
-    getArticlePageTotal
+    getArticleLabel,
 }
