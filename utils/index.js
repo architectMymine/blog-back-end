@@ -26,16 +26,16 @@ function parsePostData(ctx) {
 /**
  * 组合搜索语句
  * @param {Object} data  数据源
- * @param {Array<string>} target 目标数组
+ * @param {Array} target 目标数组
  * @returns {string} where条件语句
  */
 function recombineSearch(data, target) {
     let keys = filterUnlessValue(data, target)
-    // 组合where条件
-    let sql = `where`
+    // 组合条件
+    let sql = 'where'
     if (keys.length > 0) {
         keys.map(key => {
-            sql += ` ${key} regexp '${data[key]}' and`
+            sql += ` ${key.prefix}.${key.tableName} regexp '${data[key.prop]}' and`
         })
         sql = sql.replace(/\s+and$/, '')
     } else {
@@ -46,18 +46,24 @@ function recombineSearch(data, target) {
 
 /**
  * 组合更新语句
- * @param {Object} data  数据源
+ * @param {Object} data    数据源
+ * @param {Object} exclude 剔除数据源
  * @returns {string} set语句
  */
-function recombineUpdate(data) {
+function recombineUpdate(data,exclude) {
     let sql = 'set'
     Object.keys(data).forEach(item => {
-        if (item !== 'articleId') {
-            sql += ` ${item} = "${data[item]}",`
+        if (!exclude.includes(item)) {
+            if(item === 'content') {
+                // 将单引号全部替换为双引号
+                data[item] = data[item].replace(/'/g,'"')
+                sql +=` ${item} = '${data[item]}',`
+            }else {
+                sql += ` ${item} = '${data[item]}',`
+            }
         }
     })
     return sql.replace(/,$/,'')
-     sql
 }
 
 /**
@@ -69,7 +75,7 @@ function recombineUpdate(data) {
 function filterUnlessValue(data, target) {
     let keys = []
     target.map(key => {
-        if (data[key] != null && data[key] != '') keys.push(key)
+        if (data[key.prop] != null && data[key.prop] != '') keys.push(key)
     })
     return keys
 }
