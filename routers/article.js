@@ -13,6 +13,8 @@ const {
     getArticleLabel,
     delArticle,
 } = require('../service/article')
+const dayjs = require("dayjs");
+const { parsePostData } = require("../utils");
 
 // 文章列表
 router.get('/list', async (ctx) => {
@@ -53,7 +55,7 @@ router.post('/create', async (ctx) => {
         summary: { type: 'string', require: true },
         content: { type: 'string', require: true },
     }, { ...data })
-    const article = [data.name, data.cover, data.summary, data.content, 0]
+    const article = [data.name, data.cover, data.summary, data.content, 0, dayjs().format('YYYY-MM-DD HH:mm:ss'), null]
     // 添加文章
     const articleResult = await addArticle(article)
     if (articleResult?.insertId) {
@@ -123,7 +125,7 @@ router.delete('/delete', async (ctx) => {
             result = new Result('未找到对应文章').error()
         }
     } catch (e) {
-        result = new Result(e,'sql执行错误').error()
+        result = new Result(e, 'sql执行错误').error()
     }
     ctx.body = result
 })

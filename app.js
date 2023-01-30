@@ -32,7 +32,7 @@ app.use(function (ctx, next) {
     }
     return next().catch((err) => {
         /**
-         * 这个错误是koa-jwt内部throw出来的错误，并且要在它注册之前拦截，目前未知。
+         * 这个错误是koa-jwt内部throw出来的错误，并且要在它注册之前拦截，官方教授的拦截方法，主要是不想用koa-jwt抛出的错误。
          * token失效401处理
          */
         if (err.status === 401) {

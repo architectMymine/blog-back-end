@@ -7,7 +7,7 @@ const dayjs = require('dayjs')
 // 新增文章
 function addArticle(data) {
     return new Promise((resolve, reject) => {
-        connection.execute('INSERT INTO article (name, cover, summary, content, deleted) VALUES (?,?,?,?,?)', data).then(res => {
+        connection.execute('INSERT INTO article (name, cover, summary, content, deleted, create_time, update_time) VALUES (?,?,?,?,?,?,?)', data).then(res => {
             if (!res && res.length === 0) {
                 resolve(false)
             } else {
@@ -46,7 +46,10 @@ function insertLabel(article_id, labelArray) {
 // 更新文章内容
 function updateArticle(data) {
     return new Promise((resolve, reject) => {
-        const sql = `update article ${recombineUpdate(data, ['article_id', 'label'])} where article_id = ${data.article_id}`
+        const sql = `update article 
+                     ${recombineUpdate(data, ['article_id', 'label'])} 
+                     ,update_time = '${dayjs().format('YYYY-MM-DD HH:mm:ss')}' 
+                     where article_id = ${data.article_id}`
         connection.execute(sql).then(res => {
             if (!res && res.length === 0) {
                 resolve(false)
@@ -77,7 +80,7 @@ async function updateLabel(data) {
 // 查询文章
 function getArticleDetail(id) {
     return new Promise((resolve, reject) => {
-        const sql = `select a.article_id,a.name,group_concat(al.label_id) as label,a.cover,a.summary,a.content 
+        const sql = `select a.article_id,a.name,group_concat(al.label_id) as label,a.cover,a.summary,a.content,a.create_time
                      from article a,article_label al 
                      where a.article_id = ${id} 
                      and a.deleted = 0 
@@ -110,7 +113,7 @@ function getArticleDetail(id) {
  */
 function getArticleList(pageNum, pageSize, data) {
     return new Promise((resolve, reject) => {
-        let sql = `select a.article_id,a.name,group_concat(l.name) as label,a.cover,a.summary,a.content
+        let sql = `select a.article_id,a.name,group_concat(l.name) as label,a.cover,a.summary,a.content,a.create_time
                    from article a,article_label al, label l
                    where a.article_id = al.article_id 
                    and al.label_id = l.label_id 
