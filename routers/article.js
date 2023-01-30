@@ -1,9 +1,6 @@
 const Router = require('koa-router')
 const router = new Router({ prefix: "/article" })
 const Result = require('../model/Result')
-const {
-    parsePostData, recombineSearch,
-} = require('../utils/index')
 
 const {
     addArticle,
@@ -14,23 +11,21 @@ const {
     getArticleList,
     getArticleTotal,
     getArticleLabel,
+    delArticle,
 } = require('../service/article')
 
 // 文章列表
 router.get('/list', async (ctx) => {
     let { pageNum, pageSize } = ctx.request.query
     ctx.verifyParams({
-        pageNum: { type: 'string', require: true }, pageSize: { type: 'string', require: true },
+        pageNum: { type: 'string', require: true },
+        pageSize: { type: 'string', require: true },
     }, { pageNum, pageSize })
     let page = (pageNum - 1) * pageSize
-    const searchSql = recombineSearch(ctx.request.query, [
-        { prefix: 'a', prop: 'name', tableName: 'name' },
-        { prefix: 'l', prop: 'label', tableName: 'label_id' }
-    ])
     let result = ''
     try {
-        const list = await getArticleList(page, pageSize, searchSql)
-        const allData = await getArticleTotal(searchSql)
+        const list = await getArticleList(page, pageSize, ctx.request.query)
+        const allData = await getArticleTotal(ctx.request.query)
         const pageTotal = Math.ceil(allData.length / Number(pageSize))
         const data = {
             list,
@@ -45,6 +40,7 @@ router.get('/list', async (ctx) => {
     }
     ctx.body = result
 })
+
 
 // 新建文章
 router.post('/create', async (ctx) => {
@@ -109,6 +105,25 @@ router.get('/detail', async (ctx) => {
         result = new Result(detail, '请求完成').success()
     } else {
         result = new Result('未找到文章').error()
+    }
+    ctx.body = result
+})
+
+router.delete('/delete', async (ctx) => {
+    const { article_id } = ctx.request.query
+    ctx.verifyParams({
+        article_id: { type: 'string', require: true },
+    }, { article_id })
+    let result = {}
+    try {
+        const sqlResult = await delArticle(article_id)
+        if (sqlResult) {
+            result = new Result(null, '操作成功').success()
+        } else {
+            result = new Result('未找到对应文章').error()
+        }
+    } catch (e) {
+        result = new Result(e,'sql执行错误').error()
     }
     ctx.body = result
 })

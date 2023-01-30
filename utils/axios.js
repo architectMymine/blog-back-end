@@ -12,9 +12,7 @@ request.interceptors.response.use((res) => {
     return res.data
 })
 
-
 // http://sentence.iciba.com/index.php?c=dailysentence&m=getdetail&title=2020-04-24
-
 function getDailySentence(date) {
     return request({
         url: 'http://sentence.iciba.com/index.php',

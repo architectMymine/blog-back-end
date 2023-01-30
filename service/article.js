@@ -7,7 +7,7 @@ const dayjs = require('dayjs')
 // 新增文章
 function addArticle(data) {
     return new Promise((resolve, reject) => {
-        connection.execute('INSERT INTO article (name, cover, summary, content,deleted) VALUES (?,?,?,?,?)', data).then(res => {
+        connection.execute('INSERT INTO article (name, cover, summary, content, deleted) VALUES (?,?,?,?,?)', data).then(res => {
             if (!res && res.length === 0) {
                 resolve(false)
             } else {
@@ -79,7 +79,11 @@ function getArticleDetail(id) {
     return new Promise((resolve, reject) => {
         const sql = `select a.article_id,a.name,group_concat(al.label_id) as label,a.cover,a.summary,a.content 
                      from article a,article_label al 
-                     where a.article_id = ${id} and a.deleted = 0 and al.deleted = 0 group  by a.article_id`
+                     where a.article_id = ${id} 
+                     and a.deleted = 0 
+                     and al.deleted = 0 
+                     group  by a.article_id
+                     `
         connection.query(sql).then(res => {
             if (!res && res.length === 0) {
                 resolve(false)
@@ -96,17 +100,38 @@ function getArticleDetail(id) {
 }
 
 // 获取文章列表
-function getArticleList(pageNum, pageSize, condition) {
-    if (condition != '') {
-        condition = condition.replace(/^where\s+/, ` and `)
-    }
+/**
+ * 获取文章列表
+ * 注：这是一条sql语句实现的方法
+ * @param pageNum
+ * @param pageSize
+ * @param data
+ * @returns {Promise<unknown>}
+ */
+function getArticleList(pageNum, pageSize, data) {
     return new Promise((resolve, reject) => {
-        const sql = `select a.article_id,a.name,group_concat(l.name) as label,a.cover,a.summary,a.content
-                     from article a,article_label al, label l
-                     where a.article_id = al.article_id and al.label_id = l.label_id 
-                     and a.article_id >=(select a.article_id from article a,article_label al where a.article_id = al.article_id group by article_id limit ${pageNum},1)
-                     ${condition} 
-                     group by article_id limit ${pageSize}`
+        let sql = `select a.article_id,a.name,group_concat(l.name) as label,a.cover,a.summary,a.content
+                   from article a,article_label al, label l
+                   where a.article_id = al.article_id 
+                   and al.label_id = l.label_id 
+                   and a.deleted = 0
+                   and a.article_id >=(select a.article_id from article a,article_label al where a.article_id = al.article_id group by article_id limit ${pageNum},1)
+                  `
+        // 存在搜索条件：文章名
+        if (data.name) {
+            sql += ` and a.name regexp '${data.name}'`
+        }
+        // 存在搜索条件：文章标签
+        if (data.label) {
+            sql += ` group by a.article_id 
+                     having label regexp (select name from label where label_id = ${data.label}) 
+                     limit ${pageSize}
+                   `
+        } else {
+            sql += ` group by a.article_id 
+                     limit ${pageSize}
+                   `
+        }
         connection.query(sql).then(res => {
             if (!res && res.length === 0) {
                 resolve(false)
@@ -121,19 +146,25 @@ function getArticleList(pageNum, pageSize, condition) {
 }
 
 // 获取文章总数
-function getArticleTotal(condition) {
-    if (condition != '') {
-        condition = condition.replace(/^where\s+/, ` and `)
-    }
+function getArticleTotal(data) {
     return new Promise((resolve, reject) => {
-        const sql = `select group_concat(l.label_id),a.article_id,a.name 
-                     from article a,article_label al, label l 
-                     where a.article_id = al.article_id 
-                     and al.label_id = l.label_id
-                     and a.deleted = 0 
-                     ${condition}
-                     group by a.article_id
-                    `
+        let sql = `select group_concat(l.label_id) as label_id,a.article_id,a.name 
+                   from article a,article_label al, label l 
+                   where a.article_id = al.article_id 
+                   and al.label_id = l.label_id
+                   and a.deleted = 0 
+                  `
+        // 存在搜索条件：文章名
+        if (data.name) {
+            sql += ` and a.name regexp '${data.name}'`
+        }
+        if (data.label) {
+            sql += ` group by a.article_id 
+                     having label_id regexp '${data.label}'
+                   `
+        } else {
+            sql += ` group by a.article_id`
+        }
         connection.query(sql).then(res => {
             if (!res && res.length === 0) {
                 resolve(false)
@@ -162,6 +193,21 @@ function getArticleLabel() {
     })
 }
 
+// 删除文章
+function delArticle(articleId) {
+    return new Promise((resolve, reject) => {
+        connection.execute(`update article set deleted = 1 where article_id =${articleId}`).then(res => {
+            if (res[0].affectedRows > 0) {
+                resolve(true)
+            } else {
+                resolve(false)
+            }
+        }).catch(e => {
+            reject(e)
+        })
+    })
+}
+
 module.exports = {
     addArticle,
     updateArticle,
@@ -171,4 +217,5 @@ module.exports = {
     getArticleList,
     getArticleTotal,
     getArticleLabel,
+    delArticle,
 }

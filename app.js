@@ -26,8 +26,16 @@ app.use(koaParameter(app))
 
 // token失效401处理
 app.use(function (ctx, next) {
+    // 路由访问异常拦截
+    if (ctx.response.status === 404) {
+        ctx.body = new Result('路由不存在').error()
+    }
     return next().catch((err) => {
-        if (401 == err.status) {
+        /**
+         * 这个错误是koa-jwt内部throw出来的错误，并且要在它注册之前拦截，目前未知。
+         * token失效401处理
+         */
+        if (err.status === 401) {
             ctx.status = 401;
             if (!ctx.header.authorization || ctx.header.authorization.indexOf('Bearer ') == -1) {
                 ctx.body = new Result(null, '未携带token').jwtError();
@@ -44,8 +52,9 @@ app.use(function (ctx, next) {
 app.use(koaJwt({
     secret: TOKEN_SECRET,
 }).unless({
-    path: ['/', '/users/login',/^\/common\/*/,'/article/update']
+    path: ['/', '/users/login', /^\/common\/*/]
 }))
+
 
 // 上传中间件
 app.use(KoaBody({
@@ -57,6 +66,7 @@ app.use(KoaBody({
         keepExtensions: true, // 保留文件扩展名
     }
 }))
+
 
 // 批量路由注册
 useRoutes(app)
