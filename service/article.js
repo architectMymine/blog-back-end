@@ -5,7 +5,7 @@ const {
 const dayjs = require('dayjs')
 
 // 新增文章
-function addArticle(data) {
+function createArticle(data) {
     return new Promise((resolve, reject) => {
         connection.execute('INSERT INTO article (name, cover, summary, content, deleted, create_time, update_time) VALUES (?,?,?,?,?,?,?)', data).then(res => {
             if (!res && res.length === 0) {
@@ -212,7 +212,7 @@ function delArticle(articleId) {
 }
 
 module.exports = {
-    addArticle,
+    createArticle,
     updateArticle,
     insertLabel,
     updateLabel,

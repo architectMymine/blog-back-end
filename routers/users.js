@@ -26,8 +26,8 @@ router.get("/", async (ctx) => {
 router.post('/login', async (ctx) => {
     const data = await parsePostData(ctx)
     ctx.verifyParams({
-        username: { type: 'string', require: true },
-        password: { type: 'string', require: true },
+        username: { type: 'string', required: true },
+        password: { type: 'string', required: true },
     }, { ...data })
     let result = {}
     const sqlResult = await findUser(data.username, data.password)

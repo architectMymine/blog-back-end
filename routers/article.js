@@ -3,7 +3,7 @@ const router = new Router({ prefix: "/article" })
 const Result = require('../model/Result')
 
 const {
-    addArticle,
+    createArticle,
     updateArticle,
     insertLabel,
     updateLabel,
@@ -20,8 +20,8 @@ const { parsePostData } = require("../utils");
 router.get('/list', async (ctx) => {
     let { pageNum, pageSize } = ctx.request.query
     ctx.verifyParams({
-        pageNum: { type: 'string', require: true },
-        pageSize: { type: 'string', require: true },
+        pageNum: { type: 'string', required: true },
+        pageSize: { type: 'string', required: true },
     }, { pageNum, pageSize })
     let page = (pageNum - 1) * pageSize
     let result = ''
@@ -49,15 +49,23 @@ router.post('/create', async (ctx) => {
     const data = await parsePostData(ctx)
     let result = {}
     ctx.verifyParams({
-        name: { type: 'string', require: true },
-        label: { type: 'array', require: true },
-        cover: { type: 'string', require: true },
-        summary: { type: 'string', require: true },
-        content: { type: 'string', require: true },
+        name: { type: 'string', required: true },
+        label: { type: 'array', required: true },
+        cover: { type: 'string', required: true },
+        summary: { type: 'string', required: true },
+        content: { type: 'string', required: true },
     }, { ...data })
-    const article = [data.name, data.cover, data.summary, data.content, 0, dayjs().format('YYYY-MM-DD HH:mm:ss'), null]
+    const article = [
+        data.name,
+        data.cover,
+        data.summary,
+        data.content,
+        0,
+        dayjs().format('YYYY-MM-DD HH:mm:ss'),
+        null
+    ]
     // 添加文章
-    const articleResult = await addArticle(article)
+    const articleResult = await createArticle(article)
     if (articleResult?.insertId) {
         // 插入文章标签中间表
         const labelResult = await insertLabel(articleResult.insertId, data.label)
@@ -77,19 +85,19 @@ router.post('/update', async (ctx) => {
     const data = await parsePostData(ctx)
     let result = {}
     ctx.verifyParams({
-        article_id: { type: 'string', require: true },
-        name: { type: 'string', require: true },
-        label: { type: 'array', require: true },
-        cover: { type: 'string', require: true },
-        summary: { type: 'string', require: true },
-        content: { type: 'string', require: true },
+        article_id: { type: 'string', required: true },
+        name: { type: 'string', required: true },
+        label: { type: 'array', required: true },
+        cover: { type: 'string', required: true },
+        summary: { type: 'string', required: true },
+        content: { type: 'string', required: true },
     }, { ...data })
     try {
         await updateArticle(data)
         await updateLabel(data)
         result = new Result(null, '更新文章成功').success()
     } catch (e) {
-        result = new Result(e, '更新文章失败').error()
+        result = new Result(e, '接口错误').error()
     }
     ctx.body = result
 
@@ -99,12 +107,12 @@ router.post('/update', async (ctx) => {
 router.get('/detail', async (ctx) => {
     const { article_id } = ctx.request.query
     ctx.verifyParams({
-        article_id: { type: 'string', require: true },
+        article_id: { type: 'string', required: true },
     }, { article_id })
     const detail = await getArticleDetail(article_id)
     let result = {}
     if (!detail === false) {
-        result = new Result(detail, '请求完成').success()
+        result = new Result(detail, '请求成功').success()
     } else {
         result = new Result('未找到文章').error()
     }
@@ -114,7 +122,7 @@ router.get('/detail', async (ctx) => {
 router.delete('/delete', async (ctx) => {
     const { article_id } = ctx.request.query
     ctx.verifyParams({
-        article_id: { type: 'string', require: true },
+        article_id: { type: 'string', required: true },
     }, { article_id })
     let result = {}
     try {
