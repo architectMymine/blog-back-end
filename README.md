@@ -16,6 +16,3 @@ ctx.req.addListener("end", function () {
 })
 ```
 具体可以参考```utils/index.js```里面的```parsePostData```函数的使用。
-
-#### async-validator参数校验插件，具体可以用法可查考[这里](https://github.com/yiminghe/async-validator)
-目前比较希望对参数的校验完毕之后，返回到错误日志。然后统一拦截做错误提示返回。

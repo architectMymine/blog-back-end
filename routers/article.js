@@ -15,6 +15,7 @@ const {
 } = require('../service/article')
 const dayjs = require("dayjs");
 const { parsePostData } = require("../utils");
+const { delArticleDrafts } = require("../service/drafts");
 
 // 文章列表
 router.get('/list', async (ctx) => {
@@ -49,6 +50,7 @@ router.post('/create', async (ctx) => {
     const data = await parsePostData(ctx)
     let result = {}
     ctx.verifyParams({
+        drafts_id: { type: 'string', required: true },
         name: { type: 'string', required: true },
         label: { type: 'array', required: true },
         cover: { type: 'string', required: true },
@@ -64,6 +66,8 @@ router.post('/create', async (ctx) => {
         dayjs().format('YYYY-MM-DD HH:mm:ss'),
         null
     ]
+    // 删除草稿文章
+    if(data.drafts_id) await delArticleDrafts(data.drafts_id)
     // 添加文章
     const articleResult = await createArticle(article)
     if (articleResult?.insertId) {
@@ -128,12 +132,12 @@ router.delete('/delete', async (ctx) => {
     try {
         const sqlResult = await delArticle(article_id)
         if (sqlResult) {
-            result = new Result(null, '操作成功').success()
+            result = new Result(null, '删除成功').success()
         } else {
-            result = new Result('未找到对应文章').error()
+            result = new Result('删除失败').error()
         }
     } catch (e) {
-        result = new Result(e, 'sql执行错误').error()
+        result = new Result(e, '接口错误').error()
     }
     ctx.body = result
 })
