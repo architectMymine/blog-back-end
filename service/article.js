@@ -76,19 +76,18 @@ async function updateLabel(data) {
     }
 }
 
-
 // 查询文章
 function getArticleDetail(id) {
     return new Promise((resolve, reject) => {
         const sql = `select a.article_id,a.name,group_concat(al.label_id) as label,a.cover,a.summary,a.content,a.create_time
-                     from article a,article_label al 
+                     from article a left join article_label al on a.article_id = al.article_id
                      where a.article_id = ${id} 
                      and a.deleted = 0 
                      and al.deleted = 0 
                      group  by a.article_id
                      `
         connection.query(sql).then(res => {
-            if (!res && res.length === 0) {
+            if (res[0].length === 0) {
                 resolve(false)
             } else {
                 const detail = res[0][0]
@@ -103,14 +102,6 @@ function getArticleDetail(id) {
 }
 
 // 获取文章列表
-/**
- * 获取文章列表
- * 注：这是一条sql语句实现的方法
- * @param pageNum
- * @param pageSize
- * @param data
- * @returns {Promise<unknown>}
- */
 function getArticleList(pageNum, pageSize, data) {
     return new Promise((resolve, reject) => {
         let sql = `select a.article_id,a.name,group_concat(l.name) as label,a.cover,a.summary,a.content,a.create_time

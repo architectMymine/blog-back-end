@@ -1,3 +1,17 @@
+const { SQL_STATEMENT_ERROR } = require('./constant')
+
+/**
+ * 抛出SQL语句错误
+ * @param ctx
+ * @param error 捕获的错误
+ */
+function throwSqlError(ctx, error) {
+    ctx.throw(500, SQL_STATEMENT_ERROR, {
+        code: SQL_STATEMENT_ERROR,
+        error
+    });
+}
+
 /**
  * 解析对象数据
  * @param ctx
@@ -50,20 +64,20 @@ function recombineSearch(data, target) {
  * @param {Object} exclude 剔除数据源
  * @returns {string} set语句
  */
-function recombineUpdate(data,exclude) {
+function recombineUpdate(data, exclude) {
     let sql = 'set'
     Object.keys(data).forEach(item => {
         if (!exclude.includes(item)) {
-            if(item === 'content') {
+            if (item === 'content') {
                 // 将单引号全部替换为双引号
-                data[item] = data[item].replace(/'/g,'"')
-                sql +=` ${item} = '${data[item]}',`
-            }else {
+                data[item] = data[item].replace(/'/g, '"')
+                sql += ` ${item} = '${data[item]}',`
+            } else {
                 sql += ` ${item} = '${data[item]}',`
             }
         }
     })
-    return sql.replace(/,$/,'')
+    return sql.replace(/,$/, '')
 }
 
 /**
@@ -81,7 +95,8 @@ function filterUnlessValue(data, target) {
 }
 
 module.exports = {
+    throwSqlError,
     parsePostData,
     recombineSearch,
-    recombineUpdate
+    recombineUpdate,
 }

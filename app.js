@@ -42,6 +42,9 @@ app.use(function (ctx, next) {
             } else {
                 ctx.body = new Result(null, 'token过期').jwtError();
             }
+        } else if (err.status === 500 && err.code === 'SQL_STATEMENT_ERROR') {
+            // 捕获sql语句错误，统一抛出
+            ctx.body = new Result(err.error, '接口错误').error();
         } else {
             throw err;
         }

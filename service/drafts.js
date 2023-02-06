@@ -4,14 +4,14 @@ const { recombineUpdate } = require("../utils");
 
 // 草稿文章列表
 function getDarftsList() {
-    return new Promise((resolve, reject)=>{
-        connection.query('select drafts_id, name, label, cover, summary, content, create_time, update_time from article_drafts where deleted = 0').then(res=>{
+    return new Promise((resolve, reject) => {
+        connection.query('select drafts_id, name, label, cover, summary, content, create_time, update_time from article_drafts where deleted = 0 and article_id = 0').then(res => {
             if (!res && res.length === 0) {
                 resolve(false)
             } else {
                 resolve(res[0])
             }
-        }).catch(e=>{
+        }).catch(e => {
             reject(e)
         })
     })
@@ -21,7 +21,7 @@ function getDarftsList() {
 // 新增草稿文章
 function createArticleDrafts(data) {
     return new Promise((resolve, reject) => {
-        connection.execute('INSERT INTO article_drafts (drafts_id, name, label, cover, summary, content, create_time, update_time, deleted) VALUES (?,?,?,?,?,?,?,?,?)', data).then(res => {
+        connection.execute('INSERT INTO article_drafts (article_id, drafts_id, name, label, cover, summary, content, create_time, update_time, deleted) VALUES (?,?,?,?,?,?,?,?,?,?)', data).then(res => {
             if (!res && res.length === 0) {
                 resolve(false)
             } else {
@@ -34,31 +34,46 @@ function createArticleDrafts(data) {
 }
 
 // 查询草稿文章
-function getDraftsDetail(id) {
-    return new Promise((resolve, reject)=>{
-        connection.query(`select * from article_drafts where id = ${id}`).then(res=>{
-            if (!res && res.length === 0) {
+function getDraftsDetail({ id, drafts_id, article_id }) {
+    let sql = 'select * from article_drafts'
+    if (id) {
+        sql += ` where id = ${id}`
+    } else if (drafts_id) {
+        sql += ` where drafts_id = ${drafts_id}`
+    } else {
+        sql += ` where article_id = ${article_id}`
+    }
+    return new Promise((resolve, reject) => {
+        connection.query(sql).then(res => {
+            if (res[0].length === 0) {
                 resolve(false)
             } else {
                 const detail = res[0][0]
                 if (detail.label !== '') {
                     detail.label = detail.label.split(',').map(item => Number(item))
+                }else {
+                    detail.label = []
                 }
                 resolve(detail)
             }
+        }).catch(e => {
+            reject(e)
         })
-    }).catch(e => {
-        reject(e)
     })
 }
 
 // 更新草稿文章内容
 function updateArticleDrafts(data) {
     return new Promise((resolve, reject) => {
-        const sql = `update article_drafts 
-                     ${recombineUpdate(data, ['drafts_id'])} 
+        let sql = `update article_drafts 
+                     ${recombineUpdate(data, ['drafts_id','article_id'])} 
                      ,update_time = '${dayjs().format('YYYY-MM-DD HH:mm:ss')}' 
-                     where drafts_id = ${data.drafts_id}`
+                     `
+        if(data.drafts_id) {
+            sql += ` where drafts_id = ${data.drafts_id}`
+        }else {
+            sql += ` where article_id = ${data.article_id}`
+        }
         connection.execute(sql).then(res => {
             if (!res && res.length === 0) {
                 resolve(false)
