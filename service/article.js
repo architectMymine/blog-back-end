@@ -47,7 +47,7 @@ function insertLabel(article_id, labelArray) {
 function updateArticle(data) {
     return new Promise((resolve, reject) => {
         const sql = `update article 
-                     ${recombineUpdate(data, ['article_id', 'label'])} 
+                     ${recombineUpdate(data, ['article_id', 'label','drafts_id'])} 
                      ,update_time = '${dayjs().format('YYYY-MM-DD HH:mm:ss')}' 
                      where article_id = ${data.article_id}`
         connection.execute(sql).then(res => {
@@ -109,6 +109,7 @@ function getArticleList(pageNum, pageSize, data) {
                    where a.article_id = al.article_id 
                    and al.label_id = l.label_id 
                    and a.deleted = 0
+                   and al.deleted = 0
                    and a.article_id >=(select a.article_id from article a,article_label al where a.article_id = al.article_id group by article_id limit ${pageNum},1)
                   `
         // 存在搜索条件：文章名
@@ -187,6 +188,21 @@ function getArticleLabel() {
     })
 }
 
+// 标签下有文章的标签
+function getLableHaveArticle() {
+    return new Promise((resolve, reject) => {
+        connection.query('select distinct l.name,al.label_id from article_label al left join label l  on l.label_id = al.label_id').then(res => {
+            if (!res && res.length === 0) {
+                resolve(false)
+            } else {
+                resolve(res[0])
+            }
+        }).catch(e => {
+            reject(e)
+        })
+    })
+}
+
 // 删除文章
 function delArticle(articleId) {
     return new Promise((resolve, reject) => {
@@ -211,5 +227,6 @@ module.exports = {
     getArticleList,
     getArticleTotal,
     getArticleLabel,
+    getLableHaveArticle,
     delArticle,
 }

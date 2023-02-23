@@ -10,6 +10,7 @@ const {
     getArticleList,
     getArticleTotal,
     getArticleLabel,
+    getLableHaveArticle,
     delArticle,
 } = require('../service/article')
 const dayjs = require("dayjs");
@@ -18,13 +19,13 @@ const { delArticleDrafts, getDraftsDetail } = require("../service/drafts");
 
 // 文章列表
 router.get('/list', async (ctx) => {
-    let { pageNum, pageSize } = ctx.request.query
+    let { pageNum, pageSize, name, label } = ctx.request.query
     ctx.verifyParams({
         pageNum: { type: 'string', required: true },
         pageSize: { type: 'string', required: true },
-    }, { pageNum, pageSize })
+    }, { pageNum, pageSize, name, label })
     let page = (pageNum - 1) * pageSize
-    let result = ''
+    let result
     try {
         const list = await getArticleList(page, pageSize, ctx.request.query)
         const allData = await getArticleTotal(ctx.request.query)
@@ -46,7 +47,7 @@ router.get('/list', async (ctx) => {
 // 新建文章
 router.post('/create', async (ctx) => {
     const data = await parsePostData(ctx)
-    let result = {}
+    let result
     ctx.verifyParams({
         drafts_id: { type: 'string', required: true },
         name: { type: 'string', required: true },
@@ -90,7 +91,7 @@ router.post('/create', async (ctx) => {
 // 更新文章
 router.post('/update', async (ctx) => {
     const data = await parsePostData(ctx)
-    let result = {}
+    let result
     ctx.verifyParams({
         article_id: { type: 'string', required: true },
         name: { type: 'string', required: true },
@@ -118,7 +119,7 @@ router.post('/update', async (ctx) => {
 // 文章详情
 router.get('/detail', async (ctx) => {
     const { article_id } = ctx.request.query
-    let result = {}
+    let result
     ctx.verifyParams({
         article_id: { type: 'string', required: true },
     }, { article_id })
@@ -150,7 +151,7 @@ router.delete('/delete', async (ctx) => {
     ctx.verifyParams({
         article_id: { type: 'string', required: true },
     }, { article_id })
-    let result = {}
+    let result
     try {
         const sqlResult = await delArticle(article_id)
         if (sqlResult) {
@@ -166,7 +167,7 @@ router.delete('/delete', async (ctx) => {
 
 // 文章标签
 router.get('/label', async (ctx) => {
-    let result = {}
+    let result
     try {
         const sqlResult = await getArticleLabel()
         if (!sqlResult === false) {
@@ -177,9 +178,25 @@ router.get('/label', async (ctx) => {
     } catch (e) {
         throwSqlError(ctx, e)
     }
-
     ctx.body = result
 })
+
+// 标签下有文章的标签
+router.get('/label_with_article', async (ctx) => {
+    let result
+    try {
+        const sqlResult = await getLableHaveArticle()
+        if (!sqlResult === false) {
+            result = new Result(sqlResult, '请求完成').success()
+        } else {
+            result = new Result('获取标签失败').error()
+        }
+    } catch (e) {
+        throwSqlError(ctx, e)
+    }
+    ctx.body = result
+})
+
 
 
 module.exports = router;

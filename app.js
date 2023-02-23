@@ -9,7 +9,8 @@ const useRoutes = require('./routers/index')
 const path = require("path")
 const {
     TOKEN_SECRET,
-    SERVER_PORT
+    SERVER_PORT,
+    SQL_STATEMENT_ERROR
 } = require('./utils/constant')
 
 const Result = require('./model/Result')
@@ -42,7 +43,7 @@ app.use(function (ctx, next) {
             } else {
                 ctx.body = new Result(null, 'token过期').jwtError();
             }
-        } else if (err.status === 500 && err.code === 'SQL_STATEMENT_ERROR') {
+        } else if (err.status === 500 && err.code === SQL_STATEMENT_ERROR) {
             // 捕获sql语句错误，统一抛出
             ctx.body = new Result(err.error, '接口错误').error();
         } else {
@@ -55,7 +56,7 @@ app.use(function (ctx, next) {
 app.use(koaJwt({
     secret: TOKEN_SECRET,
 }).unless({
-    path: ['/', '/users/login', /^\/common\/*/]
+    path: ['/', '/article/list', '/article/detail', '/article/label_with_article', '/users/login', /^\/common\/*/]
 }))
 
 
