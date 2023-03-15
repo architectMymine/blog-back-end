@@ -1,4 +1,5 @@
 const { SQL_STATEMENT_ERROR } = require('./constant')
+const fs = require('fs')
 
 /**
  * 抛出SQL语句错误
@@ -94,9 +95,51 @@ function filterUnlessValue(data, target) {
     return keys
 }
 
+async function isDirExists(dirpath) {
+    return new Promise((resolve, reject) => {
+        if(!fs.existsSync(dirpath)) {
+            createDir(dirpath).then(res=>{
+                if (res) {
+                    resolve(res);
+                } else {
+                    reject(res);
+                }
+            })
+        }else {
+            resolve(true)
+        }
+    })
+}
+
+async function createDir(dirpath) {
+    return new Promise((resolve, reject) => {
+        fs.mkdir(dirpath,err => {
+            if(err){
+                reject(err)
+            }else {
+                resolve(true)
+            }
+        })
+    })
+}
+
+async function deleteFile(filePath) {
+    return new Promise((resolve, reject) => {
+        fs.unlink(filePath,(err)=>{
+            if(err){
+                reject(err)
+            }else {
+                resolve(true)
+            }
+        })
+    })
+}
+
 module.exports = {
     throwSqlError,
     parsePostData,
     recombineSearch,
     recombineUpdate,
+    isDirExists,
+    deleteFile,
 }
