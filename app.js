@@ -56,7 +56,7 @@ app.use(function (ctx, next) {
 app.use(koaJwt({
     secret: TOKEN_SECRET,
 }).unless({
-    path: ['/', '/article/list', '/article/detail', '/article/label_with_article', '/users/login', /^\/common\/*/, '/uploads']
+    path: ['/', '/article/list', '/article/detail', '/article/label_with_article', '/users/login', /^\/common\/*/, /^\/uploads\/*/]
 }))
 
 
@@ -68,10 +68,6 @@ app.use(KoaBody({
         maxFileSize: 5 * 1024 * 1024, // 设置上传文件大小最大限制，默认5M
         uploadDir: STATIC_PATH, //设置文件上传的目录
         keepExtensions: true, // 保留文件扩展名
-        onFileBegin: (name, file) => {
-            console.log('name', name)
-            console.log('file', file)
-        }
     },
 
 

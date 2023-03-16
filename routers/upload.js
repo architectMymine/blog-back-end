@@ -9,26 +9,11 @@ const {
     STATIC_PATH,
 } = require('../utils/constant')
 
-router.post("/", (ctx) => {
-    const files = ctx.request.files.files
+// 图片上传接口
+router.post("/picture", async (ctx) => {
     let result = ''
-    let list = null
     try {
-        if (Array.isArray(files)) {
-            list = files.map(item => {
-                const filesPath = singleFiles(item)
-                return {
-                    fileName: item.originalFilename,
-                    url: `${ctx.origin}/upload/${filesPath}`
-                }
-            })
-        } else {
-            const filesPath = singleFiles(files)
-            list = {
-                fileName: files.originalFilename,
-                url: `${ctx.origin}/upload/${filesPath}`
-            }
-        }
+        const list = await commonUpload(ctx, 'picture')
         result = new Result(list, '上传成功').success()
     } catch (e) {
         result = new Result('接口错误').error()
@@ -37,6 +22,48 @@ router.post("/", (ctx) => {
     ctx.body = result
 });
 
+// 音频上传接口
+router.post('/audio', async (ctx) => {
+    let result = ''
+    try {
+        const list = await commonUpload(ctx, 'audio')
+        result = new Result(list, '上传成功').success()
+    } catch (e) {
+        result = new Result('接口错误').error()
+    }
+    ctx.body = result
+})
+
+// 上传通用逻辑
+function commonUpload(ctx, dirname) {
+    return new Promise((resolve) => {
+        const files = ctx.request.files.files
+        let list = null
+        const static_path = path.join(STATIC_PATH, `./${dirname}`)
+        isDirExists(static_path).then(res => {
+            if (res) {
+                if (Array.isArray(files)) {
+                    list = files.map(item => {
+                        const filesPath = singleFiles(item,dirname)
+                        return {
+                            fileName: item.originalFilename,
+                            url: `${ctx.origin}/upload/${dirname}/${filesPath}`
+                        }
+                    })
+                } else {
+                    const filesPath = singleFiles(files,dirname)
+                    list = {
+                        fileName: files.originalFilename,
+                        url: `${ctx.origin}/upload/${dirname}/${filesPath}`
+                    }
+                }
+                resolve(list)
+            }
+        })
+    })
+}
+
+
 /**
  * 流程：
  * 1、检测有没有今天日期的文件夹
@@ -44,9 +71,9 @@ router.post("/", (ctx) => {
  * 3、删除原来上传的文件
  * @param file
  */
-function singleFiles(file) {
+function singleFiles(file,dirname) {
     const today = dayjs().format('YYYYMMDD')
-    const dirPath = path.join(STATIC_PATH, `/${today}`)
+    const dirPath = path.join(STATIC_PATH, `/${dirname}/${today}`)
     const originFilePath = path.join(STATIC_PATH, `/${file.newFilename}`)
     isDirExists(dirPath).then(res => {
         if (res) {
