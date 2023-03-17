@@ -25,7 +25,7 @@ router.get('/list', async (ctx) => {
         pageSize: { type: 'string', required: true },
         name: { type: 'string', required: false, allowEmpty: true },
         label: { type: 'string', required: false, allowEmpty: true }
-    }, { pageNum, pageSize, name, label })
+    }, { pageNum, pageSize, name: name ? name: '', label: label ? label: '' })
     let page = (pageNum - 1) * pageSize
     let result
     try {
@@ -148,7 +148,7 @@ router.get('/detail', async (ctx) => {
 })
 
 // 文章删除
-router.delete('/delete', async (ctx) => {
+router.del('/delete', async (ctx) => {
     const { article_id } = ctx.request.query
     ctx.verifyParams({
         article_id: { type: 'string', required: true },

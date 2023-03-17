@@ -68,7 +68,7 @@ router.post('/create', async (ctx) => {
 })
 
 // 删除音频
-router.delete('/delete', async (ctx) => {
+router.del('/delete', async (ctx) => {
     const { audio_id } = ctx.request.query
     ctx.verifyParams({
         audio_id: { type: 'string', required: true },
