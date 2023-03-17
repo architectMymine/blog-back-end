@@ -23,6 +23,8 @@ router.get('/list', async (ctx) => {
     ctx.verifyParams({
         pageNum: { type: 'string', required: true },
         pageSize: { type: 'string', required: true },
+        name: { type: 'string', required: false, allowEmpty: true },
+        label: { type: 'string', required: false, allowEmpty: true }
     }, { pageNum, pageSize, name, label })
     let page = (pageNum - 1) * pageSize
     let result
@@ -196,7 +198,6 @@ router.get('/label_with_article', async (ctx) => {
     }
     ctx.body = result
 })
-
 
 
 module.exports = router;
