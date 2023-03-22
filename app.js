@@ -56,7 +56,7 @@ app.use(function (ctx, next) {
 app.use(koaJwt({
     secret: TOKEN_SECRET,
 }).unless({
-    path: ['/', '/article/list', '/article/detail', '/article/label_with_article', '/users/login', /^\/common\/*/, /^\/uploads\/*/]
+    path: ['/', '/article/list', '/article/detail', '/article/label_with_article', '/users/login', '/audio/list', /^\/common\/*/, /^\/uploads\/*/]
 }))
 
 

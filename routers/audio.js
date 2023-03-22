@@ -12,7 +12,6 @@ const {
     throwSqlError
 } = require("../utils");
 const dayjs = require("dayjs");
-const { delArticle } = require("../service/article");
 
 // 音频列表
 router.get('/list', async (ctx) => {
@@ -21,7 +20,7 @@ router.get('/list', async (ctx) => {
         pageNum: { type: 'string', required: true },
         pageSize: { type: 'string', required: true },
         name: { type: 'string', required: false, allowEmpty: true }
-    }, { pageNum, pageSize, name })
+    }, { pageNum, pageSize, name: name ? name : '' })
     let page = (pageNum - 1) * pageSize
     let result
     try {
