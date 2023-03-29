@@ -25,7 +25,6 @@ function getAudioList(pageNum, pageSize, data) {
         }
         sql += `limit ${pageSize}`
 
-        console.log('audiolistSql',sql)
         connection.query(sql).then(res => {
             if (!res && res.length === 0) {
                 resolve(false)

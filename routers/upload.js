@@ -89,7 +89,7 @@ function singleFiles(file,dirname) {
             })
         }
     })
-    return `/${today}/${file.newFilename}`
+    return `${today}/${file.newFilename}`
 }
 
 module.exports = router;
