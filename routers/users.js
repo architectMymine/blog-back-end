@@ -7,13 +7,15 @@ const {
 const Result = require('../model/Result')
 const {
     findUser,
-    getUserInfo
 } = require('../service/user')
 const jwt = require('jsonwebtoken')
 const {
     TOKEN_SECRET,
     JWT_EXPIRED
 } = require('../utils/constant')
+
+const { getUserDetail } = require('../utils/user')
+
 
 router.get("/", async (ctx) => {
     // console.log('ctx.request.query', ctx.request.query)
@@ -47,21 +49,15 @@ router.post('/login', async (ctx) => {
 
 // 获取用户信息
 router.get('/info', async (ctx) => {
-    let token = ctx.header.authorization
-    if (token.includes('Bearer ')) {
-        token = token.replace('Bearer ', '')
-    }
-    // 解析token
-    const decode = jwt.verify(token, TOKEN_SECRET)
-    let result = {}
-    if (decode && decode.username) {
-        const userInfo = await getUserInfo(decode.username)
-        if (!userInfo) {
-            result = new Result(null, '获取用户信息失败').error()
-        } else {
+    let result
+    try {
+        const userInfo = await getUserDetail(ctx)
+        if (userInfo) {
             result = new Result(userInfo, '获取用户信息成功').success()
+        } else {
+            result = new Result(null, '获取用户信息失败').error()
         }
-    } else {
+    } catch (e) {
         result = new Result(null, '解析用户信息失败').error()
     }
     ctx.body = result

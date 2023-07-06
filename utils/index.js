@@ -62,7 +62,7 @@ function recombineSearch(data, target) {
 /**
  * 组合更新语句
  * @param {Object} data    数据源
- * @param {Object} exclude 剔除数据源
+ * @param {Array} exclude 剔除数据源
  * @returns {string} set语句
  */
 function recombineUpdate(data, exclude) {

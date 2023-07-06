@@ -95,7 +95,7 @@ router.post('/update', async (ctx) => {
     const data = await parsePostData(ctx)
     let result
     ctx.verifyParams({
-        article_id: { type: 'number', required: true },
+        article_id: { type: 'string', required: true },
         name: { type: 'string', required: true },
         label: { type: 'array', required: true },
         cover: { type: 'string', required: true },
