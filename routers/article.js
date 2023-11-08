@@ -12,6 +12,7 @@ const {
     getArticleLabel,
     getLableHaveArticle,
     delArticle,
+    archivesArticle,
 } = require('../service/article')
 const dayjs = require("dayjs");
 const { parsePostData, throwSqlError } = require("../utils");
@@ -25,7 +26,7 @@ router.get('/list', async (ctx) => {
         pageSize: { type: 'string', required: true },
         name: { type: 'string', required: false, allowEmpty: true },
         label: { type: 'string', required: false, allowEmpty: true }
-    }, { pageNum, pageSize, name: name ? name: '', label: label ? label: '' })
+    }, { pageNum, pageSize, name: name ? name : '', label: label ? label : '' })
     let page = (pageNum - 1) * pageSize
     let result
     try {
@@ -192,6 +193,22 @@ router.get('/label_with_article', async (ctx) => {
             result = new Result(sqlResult, '请求完成').success()
         } else {
             result = new Result('获取标签失败').error()
+        }
+    } catch (e) {
+        throwSqlError(ctx, e)
+    }
+    ctx.body = result
+})
+
+// 文章归档
+router.get('/archives', async (ctx) => {
+    let result;
+    try {
+        const res = await archivesArticle()
+        if (res.length) {
+            result = new Result(res, '获取成功').success()
+        } else {
+            result = new Result(null, '获取失败').error()
         }
     } catch (e) {
         throwSqlError(ctx, e)

@@ -59,6 +59,7 @@ app.use(koaJwt({
     path: ['/',
         '/article/list',
         '/article/detail',
+        '/article/archives',
         '/article/label_with_article',
         '/users/login',
         '/audio/list',
@@ -78,8 +79,6 @@ app.use(KoaBody({
         uploadDir: STATIC_PATH, //设置文件上传的目录
         keepExtensions: true, // 保留文件扩展名
     },
-
-
 }))
 
 

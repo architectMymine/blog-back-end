@@ -12,7 +12,7 @@ const Result = require('../model/Result')
 router.get('/daily', async (ctx) => {
     let result, daily
     const { date } = ctx.request.query
-    daily = date ? date : dayjs().format('YYYY-MM-DD')
+    daily = date ? date : dayjs().format('YYYY-MM-DD')   
     try {
         const res = await getDailySentence(daily)
         const data = {

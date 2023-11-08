@@ -47,7 +47,7 @@ function insertLabel(article_id, labelArray) {
 function updateArticle(data) {
     return new Promise((resolve, reject) => {
         const sql = `update article 
-                     ${recombineUpdate(data, ['article_id', 'label','drafts_id'])} 
+                     ${recombineUpdate(data, ['article_id', 'label', 'drafts_id'])} 
                      ,update_time = '${dayjs().format('YYYY-MM-DD HH:mm:ss')}' 
                      where article_id = ${data.article_id}`
         connection.execute(sql).then(res => {
@@ -218,6 +218,22 @@ function delArticle(articleId) {
     })
 }
 
+// 文章归档
+function archivesArticle() {
+    return new Promise((resolve, reject) => {
+        connection.execute('select date_format(create_time,"%Y")as year,date_format(create_time,"%m-%d")as day,article_id, name ,cover from article').then(res => {
+            if (!res && res.length === 0) {
+                resolve(false)
+            } else {
+                resolve(res[0])
+            }
+        }).catch(e => {
+            reject(e)
+        })
+    })
+}
+
+
 module.exports = {
     createArticle,
     updateArticle,
@@ -229,4 +245,5 @@ module.exports = {
     getArticleLabel,
     getLableHaveArticle,
     delArticle,
+    archivesArticle,
 }

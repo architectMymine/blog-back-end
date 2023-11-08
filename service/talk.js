@@ -7,14 +7,14 @@ const dayjs = require('dayjs')
 // 获取说说列表
 function getTalkList(pageNum, pageSize, data) {
     return new Promise((resolve, reject) => {
-        let sql = `select ut.talk_id,ut.user_id,u.name as username,ut.content,ut.photo,ut.create_time,ut.update_time,ut.deleted
+        let sql = `select ut.talk_id,ut.user_id,u.name as username,u.avatar,ut.content,ut.photo,ut.create_time,ut.update_time,ut.deleted
                     from users u,users_talk ut
                     where ut.user_id = u.userId
-                    and ut.deleted = 0 `
+                    and ut.deleted = 0`
         if (data.name) {
             sql += ` and u.name = '${data.username}'`
         }
-        sql += `limit ${pageSize}`
+        sql += ` order by ut.create_time desc limit ${pageSize}`
         connection.query(sql).then(res => {
             if (!res && res.length === 0) {
                 resolve(false)

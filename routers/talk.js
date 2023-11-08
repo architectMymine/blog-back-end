@@ -69,7 +69,6 @@ router.post('/create', async ctx => {
 
 // 修改说说
 router.post('/update', async (ctx) => {
-    console.log('???????')
     const data = await parsePostData(ctx)
     let result
     ctx.verifyParams({
